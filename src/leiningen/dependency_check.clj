@@ -48,22 +48,38 @@
 
 (defn- write-report
   "Writes a report using the analysis information in the specified engine and returns the engine"
-  [engine]
+  [engine output-format output-directory]
   (info "Generating report...")
   (let [generator (ReportGenerator. "Analysis Report"
                                     (.getDependencies engine)
                                     (.getAnalyzers engine)
                                     (db-properties))]
-    (.generateReports generator "target" ReportGenerator$Format/HTML))
+    (.generateReports generator output-directory output-format))
   (info "Done.")
 
   engine)
 
+(def report-format-map
+  {:xml  ReportGenerator$Format/XML
+   :html ReportGenerator$Format/HTML})
+
+(defn- report-format
+  "Accepts a keyword (:xml :html) and returns the Java Enum value used by the underlying library to indicate the report format"
+  [format-key]
+  (get report-format-map format-key ReportGenerator$Format/HTML))
+
 (defn dependency-check
-  "Scans the JAR files found on the class path and writes a report to the ./target directory"
-  [project & args]
-  (-> project
-      target-files
-      scan-files
-      analyze-files
-      write-report))
+  "Scans the JAR files found on the class path and creates a vulnerability report.
+
+Accepts the following parameters
+  output-format     The format in which the report will be written. Either :xml or :html
+  output-directory  The directory in which the report will be written. The default is ./target"
+  ([project] (dependency-check project ":html" "target"))
+  ([project output-format] (dependency-check project output-format "target"))
+  ([project output-format output-directory]
+   (let [format-key (-> output-format read-string report-format)]
+     (-> project
+         target-files
+         scan-files
+         analyze-files
+         (write-report format-key output-directory)))))
