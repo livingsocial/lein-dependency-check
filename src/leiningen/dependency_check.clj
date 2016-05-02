@@ -50,8 +50,11 @@
   "Writes a report using the analysis information in the specified engine and returns the engine"
   [engine report-name output-format output-directory]
   (info "Generating report...")
-  (let [generator (ReportGenerator. report-name
-                                    (.getDependencies engine)
+  (let [dependencies (->> engine
+                          (.getDependencies)
+                          (sort-by #(.getFileName %)))
+        generator (ReportGenerator. report-name
+                                    dependencies
                                     (.getAnalyzers engine)
                                     (db-properties))]
     (.generateReports generator output-directory output-format))
