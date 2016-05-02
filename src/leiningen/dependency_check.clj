@@ -61,7 +61,9 @@
 
 (def report-format-map
   {:xml  ReportGenerator$Format/XML
-   :html ReportGenerator$Format/HTML})
+   :html ReportGenerator$Format/HTML
+   :all  ReportGenerator$Format/ALL
+   :vuln ReportGenerator$Format/VULN})
 
 (defn- report-format
   "Accepts a keyword (:xml :html) and returns the Java Enum value used by the underlying library to indicate the report format"
