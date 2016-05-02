@@ -48,9 +48,9 @@
 
 (defn- write-report
   "Writes a report using the analysis information in the specified engine and returns the engine"
-  [engine output-format output-directory]
+  [engine report-name output-format output-directory]
   (info "Generating report...")
-  (let [generator (ReportGenerator. "Analysis Report"
+  (let [generator (ReportGenerator. report-name
                                     (.getDependencies engine)
                                     (.getAnalyzers engine)
                                     (db-properties))]
@@ -82,5 +82,5 @@ Accepts the following parameters
          target-files
          scan-files
          analyze-files
-         (write-report format-key output-directory)
+         (write-report (:name project) format-key output-directory)
          .cleanup))))
