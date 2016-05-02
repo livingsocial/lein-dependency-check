@@ -82,4 +82,5 @@ Accepts the following parameters
          target-files
          scan-files
          analyze-files
-         (write-report format-key output-directory)))))
+         (write-report format-key output-directory)
+         .cleanup))))
