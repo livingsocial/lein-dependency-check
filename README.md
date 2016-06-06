@@ -1,6 +1,6 @@
 # lein-dependency-check
 
-A Leiningen plugin to do many wonderful things.
+A Leiningen plugin for detecting vulnerable project dependencies. Basic clojure wrapper for [OWASP Dependency Check](https://www.owasp.org/index.php/OWASP_Dependency_Check).
 
 ## Configuration
 
@@ -33,7 +33,7 @@ To write the report to a different directory (e.g., `/tmp`), run:
 
 ## License
 
-Copyright © 2016 FIXME
+Copyright © 2016 LivingSocial
 
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+Distributed as open source under the terms of the [MIT
+License](http://opensource.org/licenses/MIT).
