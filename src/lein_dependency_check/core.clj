@@ -1,9 +1,11 @@
 (ns lein-dependency-check.core
   (:require [clojure.java.io :as io])
   (:import (org.owasp.dependencycheck Engine)
-           (org.owasp.dependencycheck.utils Settings)
+           (org.owasp.dependencycheck.utils Settings Settings$KEYS)
            (org.owasp.dependencycheck.data.nvdcve CveDB)
            (org.owasp.dependencycheck.reporting ReportGenerator ReportGenerator$Format)))
+
+(defonce SUPPRESSION_FILE "suppression.xml")
 
 (defn- db-properties
   "Returns the CVE database properties"
@@ -25,6 +27,8 @@
   "Scans the specified files and returns the engine used to scan"
   [files]
   (Settings/initialize)
+  (when (.exists (io/as-file SUPPRESSION_FILE))
+    (Settings/setString Settings$KEYS/SUPPRESSION_FILE SUPPRESSION_FILE))
   (let [engine (Engine.)]
     (prn "Scanning" (count files) "file(s)...")
     (doseq [file files]

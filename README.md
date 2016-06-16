@@ -19,6 +19,7 @@ If you are on Leiningen 1.x do `lein plugin install lein-dependency-check 0.1.1`
 Add `[com.livingsocial/lein-dependency-check "0.1.1"]` to the `:plugins` vector of your project.clj.
 
 ## Usage
+
 To generate a `dependency-check-report.html` report file to the current project's `target` directory, run:
 
     $ lein dependency-check
@@ -30,6 +31,14 @@ To generate the report in XML format, run:
 To write the report to a different directory (e.g., `/tmp`), run:
 
     $ lein dependency-check :html /tmp
+
+##  Suppressing False Positives
+
+Support for suppressing false positives can be utilized by creating `suppression.xml` in your project's root directory.
+
+Suppression snippets can be copied from the HTML report file directly into `suppression.xml`. Upon rerun of `lein-dependency-check`, the suppression file will be used and warnings will not be present in report.
+
+For more information about dependency-check suppression system see https://jeremylong.github.io/DependencyCheck/general/suppression.html
 
 ## License
 
