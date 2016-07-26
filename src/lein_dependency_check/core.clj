@@ -3,9 +3,20 @@
   (:import (org.owasp.dependencycheck Engine)
            (org.owasp.dependencycheck.utils Settings Settings$KEYS)
            (org.owasp.dependencycheck.data.nvdcve CveDB)
-           (org.owasp.dependencycheck.reporting ReportGenerator ReportGenerator$Format)))
+           (org.owasp.dependencycheck.reporting ReportGenerator ReportGenerator$Format)
+		   (org.apache.log4j PropertyConfigurator)))
 
 (defonce SUPPRESSION_FILE "suppression.xml")
+(defonce SOURCE_DIR       "src")
+(defonce LOG_CONF_FILE    "log4j.properties")
+
+(defn reconfigure-log4j
+  "Reconfigures log4j from a log4j.properties file"
+  []
+  (prn "reconfiguring log4j")
+  (let [config-file (io/file SOURCE_DIR LOG_CONF_FILE)]
+    (when (.exists (io/file SOURCE_DIR LOG_CONF_FILE))
+	   (PropertyConfigurator/configure (.getPath config-file)))))
 
 (defn- db-properties
   "Returns the CVE database properties"
@@ -77,6 +88,7 @@
 (defn main
   "Scans the JAR files found on the class path and creates a vulnerability report."
   [project-classpath project-name output-format output-directory]
+  (reconfigure-log4j)
   (let [format-key (-> output-format read-string report-format)]
     (-> project-classpath
         target-files
