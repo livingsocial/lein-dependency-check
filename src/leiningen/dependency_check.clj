@@ -23,7 +23,8 @@
   ([project output-format] (dependency-check project output-format "target"))
   ([project output-format output-directory]
    (let [classpath (cp/get-classpath project)
-         name      (:name project)]
+         name      (:name project)
+         config    (:dependency-check project)]
      (eval/eval-in-project (dependency-check-project project)
-                           `(lein-dependency-check.core/main '~classpath '~name '~output-format '~output-directory)
+                           `(lein-dependency-check.core/main '~classpath '~name '~output-format '~output-directory '~config)
                            '(require 'lein-dependency-check.core)))))
