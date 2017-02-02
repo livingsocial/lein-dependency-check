@@ -85,9 +85,20 @@
   [format-key]
   (get report-format-map format-key ReportGenerator$Format/HTML))
 
+(defn- throw-exception-on-vulnerability [engine {:keys [log throw]}]
+  (.cleanup engine)
+  (when-let [vulnerable-dependencies (seq (filter
+                                           #((complement empty?) (.getVulnerabilities %))
+                                           (.getDependencies engine)))]
+    (when log
+      (doall (map #(prn "Vulnerable Dependency:" (.toString %)) vulnerable-dependencies)))
+    (when throw
+      (throw (ex-info "Vulnerable Dependencies!" {:vulnerable vulnerable-dependencies}))))
+  engine)
+
 (defn main
   "Scans the JAR files found on the class path and creates a vulnerability report."
-  [project-classpath project-name output-format output-directory]
+  [project-classpath project-name output-format output-directory config]
   (reconfigure-log4j)
   (let [format-key (-> output-format read-string report-format)]
     (-> project-classpath
@@ -95,4 +106,4 @@
         scan-files
         analyze-files
         (write-report project-name format-key output-directory)
-        .cleanup)))
+        (throw-exception-on-vulnerability config))))
