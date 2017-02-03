@@ -18,6 +18,10 @@ If you are on Leiningen 1.x do `lein plugin install lein-dependency-check 0.1.3`
 
 Add `[com.livingsocial/lein-dependency-check "0.1.3"]` to the `:plugins` vector of your project.clj.
 
+Project-level configuration may be provided under a `:dependency-check` key in your project.clj. Currently supported options are:
+ * `:log` log each vulnerability found to stdout
+ * `:throw` throw an exception after analysis and reporting if vulnerabilities are found, eg. to fail a build
+
 ## Usage
 
 To generate a `dependency-check-report.html` report file to the current project's `target` directory, run:
