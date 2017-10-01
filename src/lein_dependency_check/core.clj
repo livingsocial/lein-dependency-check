@@ -90,7 +90,8 @@
   (when-let [vulnerable-dependencies (->> (.getDependencies engine)
                                           (filter #((complement empty?) (.getVulnerabilities %)))
                                           (map (fn [dep] {:dependency dep
-                                                          :vulnerabilities (.getVulnerabilities dep)})))]
+                                                          :vulnerabilities (.getVulnerabilities dep)}))
+                                          seq)]
     (when log
       (doall (map #(prn "Vulnerable Dependency:" (.toString %)) vulnerable-dependencies)))
     (when throw
