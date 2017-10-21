@@ -37,10 +37,10 @@
 (defn- scan-files
   "Scans the specified files and returns the engine used to scan"
   [files]
-  (Settings/initialize)
-  (when (.exists (io/as-file SUPPRESSION_FILE))
-    (Settings/setString Settings$KEYS/SUPPRESSION_FILE SUPPRESSION_FILE))
-  (let [engine (Engine.)]
+  (let [settings (Settings.)
+        _ (when (.exists (io/as-file SUPPRESSION_FILE))
+            (.setString settings Settings$KEYS/SUPPRESSION_FILE SUPPRESSION_FILE))
+        engine (Engine. settings)]
     (prn "Scanning" (count files) "file(s)...")
     (doseq [file files]
       (prn "Scanning file" (.getCanonicalPath file))
