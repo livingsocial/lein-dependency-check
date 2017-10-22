@@ -18,14 +18,18 @@
 	   (prn "Reconfiguring log4j")
 	   (PropertyConfigurator/configure (.getPath config-file)))))
 
+(defmacro ^:private with-cve-db
+  [bind settings & body]
+  `(let [db# (CveDB. ~settings)
+         f# (fn [~bind] ~@body)]
+     (f# db#)
+     (.close db#)))
+
 (defn- db-properties
   "Returns the CVE database properties"
-  []
-  (let [cve-db (CveDB.)
-        _ (.open cve-db)
-        result (.getDatabaseProperties cve-db)
-        _ (.close cve-db)]
-    result))
+  [settings]
+  (with-cve-db cve-db settings
+    (.getDatabaseProperties cve-db)))
 
 (defn- target-files
   "Selects the files to be scanned"
@@ -68,8 +72,9 @@
         generator (ReportGenerator. report-name
                                     dependencies
                                     (.getAnalyzers engine)
-                                    (db-properties))]
-    (.generateReports generator output-directory output-format))
+                                    (db-properties (.getSettings engine))
+                                    (.getSettings engine))]
+    (.write generator output-directory output-format))
   (prn "Done.")
 
   engine)
@@ -86,7 +91,8 @@
   (get report-format-map format-key ReportGenerator$Format/HTML))
 
 (defn- throw-exception-on-vulnerability [engine {:keys [log throw]}]
-  (.cleanup engine)
+  (.cleanup (.getSettings engine) true)
+  (.close engine)
   (when-let [vulnerable-dependencies (->> (.getDependencies engine)
                                           (filter #((complement empty?) (.getVulnerabilities %)))
                                           (map (fn [dep] {:dependency dep
