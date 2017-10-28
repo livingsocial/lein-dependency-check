@@ -1,5 +1,7 @@
 (ns lein-dependency-check.core
-  (:require [clojure.java.io :as io])
+  (:require [clojure.java.io :as io]
+            [clojure.pprint :refer [pprint]]
+            [clojure.string :refer [starts-with?]])
   (:import (org.owasp.dependencycheck Engine)
            (org.owasp.dependencycheck.utils Settings Settings$KEYS)
            (org.owasp.dependencycheck.data.nvdcve CveDB)
@@ -17,19 +19,6 @@
     (when (.exists config-file)
 	   (prn "Reconfiguring log4j")
 	   (PropertyConfigurator/configure (.getPath config-file)))))
-
-(defmacro ^:private with-cve-db
-  [bind settings & body]
-  `(let [db# (CveDB. ~settings)
-         f# (fn [~bind] ~@body)]
-     (f# db#)
-     (.close db#)))
-
-(defn- db-properties
-  "Returns the CVE database properties"
-  [settings]
-  (with-cve-db cve-db settings
-    (.getDatabaseProperties cve-db)))
 
 (defn- target-files
   "Selects the files to be scanned"
@@ -62,36 +51,13 @@
 
   engine)
 
-(defn- write-report
-  "Writes a report using the analysis information in the specified engine and returns the engine"
-  [engine report-name output-format output-directory]
-  (prn "Generating report...")
-  (let [dependencies (->> engine
-                          (.getDependencies)
-                          (sort-by #(.getFileName %)))
-        generator (ReportGenerator. report-name
-                                    dependencies
-                                    (.getAnalyzers engine)
-                                    (db-properties (.getSettings engine))
-                                    (.getSettings engine))]
-    (.write generator output-directory output-format))
-  (prn "Done.")
 
+(defn- write-report
+  [engine report-name output-format output-directory]
+  (.writeReports engine report-name output-directory output-format)
   engine)
 
-(def report-format-map
-  {:xml  ReportGenerator$Format/XML
-   :html ReportGenerator$Format/HTML
-   :all  ReportGenerator$Format/ALL
-   :vuln ReportGenerator$Format/VULN})
-
-(defn- report-format
-  "Accepts a keyword (:xml :html) and returns the Java Enum value used by the underlying library to indicate the report format"
-  [format-key]
-  (get report-format-map format-key ReportGenerator$Format/HTML))
-
-(defn- throw-exception-on-vulnerability [engine {:keys [log throw]}]
-  (.cleanup (.getSettings engine) true)
+(defn- handle-vulnerabilities [engine {:keys [log throw]}]
   (.close engine)
   (when-let [vulnerable-dependencies (->> (.getDependencies engine)
                                           (filter #((complement empty?) (.getVulnerabilities %)))
@@ -108,10 +74,13 @@
   "Scans the JAR files found on the class path and creates a vulnerability report."
   [project-classpath project-name output-format output-directory config]
   (reconfigure-log4j)
-  (let [format-key (-> output-format read-string report-format)]
+  (let [output-format (if (starts-with? output-format ":")
+                        (.substring output-format 1)
+                        output-format)
+        output-target (io/file output-directory)]
     (-> project-classpath
         target-files
         scan-files
         analyze-files
-        (write-report project-name format-key output-directory)
-        (throw-exception-on-vulnerability config))))
+        (write-report project-name output-format output-target)
+        (handle-vulnerabilities config))))
