@@ -9,14 +9,14 @@ A Leiningen plugin for detecting vulnerable project dependencies. Basic clojure 
 To run dependency-check without having to add it to every Leiningen project as a project-level plugin,
 add dependency-check to the `:plugins` vector of your `:user` profile. E.g., a `~/.lein/profiles.clj` with dependency-check as a plugin -
 ```
-{:user {:plugins [[com.livingsocial/lein-dependency-check "1.0.2"]]}}
+{:user {:plugins [[com.livingsocial/lein-dependency-check "1.0.3"]]}}
 ```
 
-If you are on Leiningen 1.x do `lein plugin install lein-dependency-check 1.0.2`.
+If you are on Leiningen 1.x do `lein plugin install lein-dependency-check 1.0.3`.
 
 ### As a Project-Level Plugin:
 
-Add `[com.livingsocial/lein-dependency-check "1.0.2"]` to the `:plugins` vector of your project.clj.
+Add `[com.livingsocial/lein-dependency-check "1.0.3"]` to the `:plugins` vector of your project.clj.
 
 Project-level configuration may be provided under a `:dependency-check` key in your project.clj. Currently supported options are:
  * `:log` log each vulnerability found to stdout
