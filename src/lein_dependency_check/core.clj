@@ -29,10 +29,12 @@
 
 (defn- scan-files
   "Scans the specified files and returns the engine used to scan"
-  [files]
+  [files {:keys [properties-file]}]
   (let [settings (Settings.)
         _ (when (.exists (io/as-file SUPPRESSION_FILE))
             (.setString settings Settings$KEYS/SUPPRESSION_FILE SUPPRESSION_FILE))
+        _ (when properties-file
+            (.mergeProperties settings properties-file))
         engine (Engine. settings)]
     (prn "Scanning" (count files) "file(s)...")
     (doseq [file files]
@@ -80,7 +82,7 @@
         output-target (io/file output-directory)]
     (-> project-classpath
         target-files
-        scan-files
+        (scan-files config)
         analyze-files
         (write-report project-name output-format output-target)
         (handle-vulnerabilities config))))
