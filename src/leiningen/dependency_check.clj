@@ -4,7 +4,7 @@
             [leiningen.core.classpath :as cp]
             [leiningen.core.eval :as eval]))
 
-(def cli-options
+(def ^:private cli-options
   "Command line options accepts:
   log, throw, output-format, output-directory, properties-file."
   [[nil "--log" "Log to stdout"]
@@ -16,7 +16,7 @@
                     (string/split #",")))]
    ["-o" "--output-directory DIR" "The folder to write to. The default is ./target"]])
 
-(def cli-defaults
+(def ^:private cli-defaults
   "Default options."
   {:output-format ["html"]
    :output-directory "target"
