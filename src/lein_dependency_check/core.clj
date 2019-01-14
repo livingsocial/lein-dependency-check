@@ -72,8 +72,8 @@
       (let [max-score (->> vulnerable-dependencies
                            (mapcat :vulnerabilities)
                            (map #(.getCvssScore %))
-                           (apply max-key identity))]
-        (when (> max-score min-cvss)
+                           (apply max))]
+        (when (>= max-score min-cvss)
           (throw (ex-info "Vulnerable Dependencies!" {:vulnerable vulnerable-dependencies}))))))
   engine)
 
