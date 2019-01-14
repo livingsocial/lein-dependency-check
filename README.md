@@ -21,6 +21,7 @@ Add `[com.livingsocial/lein-dependency-check "1.0.4"]` to the `:plugins` vector 
 Project-level configuration may be provided under a `:dependency-check` key in your project.clj. Currently supported options are:
  * `:log` log each vulnerability found to stdout
  * `:throw` throw an exception after analysis and reporting if vulnerabilities are found, eg. to fail a build
+ * `:min-cvss` minimum cvss score required to `:throw` (number from 0 to 10), defaults to 0
  * `:properties-file` properties file to merge with DependencyCheck settings
 
 ## Usage
