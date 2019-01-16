@@ -52,11 +52,11 @@ To set throw error when vulnerabilities found:
 
     $ lein dependency-check --throw
 
-To set a suppression file
+To set a suppression file:
 
     $ lein dependency-check --suppression-file /suppression.xml
 
-To set a properties file
+To set a properties file:
 
     $ lein dependency-check --properties-file /dependencycheck.properties
 
