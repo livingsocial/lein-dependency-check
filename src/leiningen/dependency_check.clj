@@ -14,12 +14,14 @@
     :parse-fn (fn [output-format]
                 (-> (string/replace output-format #":" "")
                     (string/split #",")))]
-   ["-o" "--output-directory DIR" "The folder to write to. The default is ./target"]])
+   ["-o" "--output-directory DIR" "The folder to write to. The default is ./target"]
+   ["-s" "--suppression-file FILE" "Path to the suppression XML file"]])
 
 (def ^:private cli-defaults
   "Default options."
   {:output-format ["html"]
    :output-directory "target"
+   :suppression-file "suppression.xml"
    :log false
    :throw false})
 

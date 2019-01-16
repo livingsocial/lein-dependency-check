@@ -7,7 +7,6 @@
            (org.owasp.dependencycheck.reporting ReportGenerator ReportGenerator$Format)
 		   (org.apache.log4j PropertyConfigurator)))
 
-(defonce SUPPRESSION_FILE "suppression.xml")
 (defonce SOURCE_DIR       "src")
 (defonce LOG_CONF_FILE    "log4j.properties")
 
@@ -28,10 +27,10 @@
 
 (defn- scan-files
   "Scans the specified files and returns the engine used to scan"
-  [files {:keys [properties-file]}]
+  [files {:keys [properties-file suppression-file]}]
   (let [settings (Settings.)
-        _ (when (.exists (io/as-file SUPPRESSION_FILE))
-            (.setString settings Settings$KEYS/SUPPRESSION_FILE SUPPRESSION_FILE))
+        _ (when (.exists (io/as-file suppression-file))
+            (.setString settings Settings$KEYS/SUPPRESSION_FILE suppression-file))
         _ (when properties-file
             (.mergeProperties settings properties-file))
         engine (Engine. settings)]
