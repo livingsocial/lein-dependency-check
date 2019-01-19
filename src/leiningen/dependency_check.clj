@@ -21,11 +21,12 @@
 
 (def ^:private cli-defaults
   "Default options."
-  {:output-format ["html"]
+  {:output-format    ["html"]
    :output-directory "target"
    :suppression-file "suppression.xml"
-   :log false
-   :throw false})
+   :log              false
+   :throw            false
+   :min-cvss         0})
 
 (defn- dependency-check-project
   "Create a project to launch dependency-check, with only dependency-check as a dependency."
