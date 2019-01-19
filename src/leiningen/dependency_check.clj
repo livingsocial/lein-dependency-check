@@ -1,6 +1,29 @@
 (ns leiningen.dependency-check
-  (:require [leiningen.core.classpath :as cp]
+  (:require [clojure.string :as string]
+            [clojure.tools.cli :refer [parse-opts]]
+            [leiningen.core.classpath :as cp]
             [leiningen.core.eval :as eval]))
+
+(def ^:private cli-options
+  "Command line options accepts:
+  log, throw, output-format, output-directory, properties-file."
+  [[nil "--log" "Log to stdout"]
+   [nil "--throw" "throw error when vulnerabilities found"]
+   ["-p" "--properties-file FILE" "Specificies a file that contains properties to merge with defaults."]
+   ["-f" "--output-format FORMAT(S)" "The output format to write to (XML, HTML, CSV, JSON, VULN, ALL). Default is HTML"
+    :parse-fn (fn [output-format]
+                (-> (string/replace output-format #":" "")
+                    (string/split #",")))]
+   ["-o" "--output-directory DIR" "The folder to write to. The default is ./target"]
+   ["-s" "--suppression-file FILE" "Path to the suppression XML file"]])
+
+(def ^:private cli-defaults
+  "Default options."
+  {:output-format ["html"]
+   :output-directory "target"
+   :suppression-file "suppression.xml"
+   :log false
+   :throw false})
 
 (defn- dependency-check-project
   "Create a project to launch dependency-check, with only dependency-check as a dependency."
@@ -16,15 +39,18 @@
                             "the project itself.")))))
 
 (defn dependency-check
-  " Accepts the following parameters
-  output-format     The format in which the report will be written. Either :xml or :html
-  output-directory  The directory in which the report will be written. The default is ./target"
-  ([project] (dependency-check project ":html" "target"))
-  ([project output-format] (dependency-check project output-format "target"))
-  ([project output-format output-directory]
-   (let [classpath (cp/get-classpath project)
-         name      (:name project)
-         config    (:dependency-check project)]
-     (eval/eval-in-project (dependency-check-project project)
-                           `(lein-dependency-check.core/main '~classpath '~name '~output-format '~output-directory '~config)
-                           '(require 'lein-dependency-check.core)))))
+  "CLI options will overwrite config options.
+  Default options:
+  log => false
+  throw => false
+  output-format => :html
+  output-directory => ./target"
+  [project & args]
+  (let [classpath (cp/get-classpath project)
+        name (:name project)
+        config (merge cli-defaults
+                      (:dependency-check project)
+                      (:options (parse-opts args cli-options)))]
+    (eval/eval-in-project (dependency-check-project project)
+                          `(lein-dependency-check.core/main '~classpath '~name '~config)
+                          '(require 'lein-dependency-check.core))))

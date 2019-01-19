@@ -21,7 +21,10 @@ Add `[com.livingsocial/lein-dependency-check "1.0.4"]` to the `:plugins` vector 
 Project-level configuration may be provided under a `:dependency-check` key in your project.clj. Currently supported options are:
  * `:log` log each vulnerability found to stdout
  * `:throw` throw an exception after analysis and reporting if vulnerabilities are found, eg. to fail a build
- * `:properties-file` properties file to merge with DependencyCheck settings
+ * `properties-file` Specifies a file that contains properties to merge with default values
+ * `output-format` Vector of desired output formats: xml, csv, json, html, vuln, all
+ * `output-directory` Directory to output results to
+ * `suppression-file` Path to the suppression XML file
 
 ## Usage
 
@@ -31,11 +34,31 @@ To generate a `dependency-check-report.html` report file to the current project'
 
 To generate the report in XML format, run:
 
-    $ lein dependency-check :xml
+    $ lein dependency-check --output-format :xml
+
+To generate the report in multiple formats, run:
+
+    $ lein dependency-check --output-format :xml,:json,:html,:csv
 
 To write the report to a different directory (e.g., `/tmp`), run:
 
-    $ lein dependency-check :html /tmp
+    $ lein dependency-check --output-directory /tmp
+
+To set logging to stdout:
+
+    $ lein dependency-check --log
+
+To set throw error when vulnerabilities found:
+
+    $ lein dependency-check --throw
+
+To set a suppression file:
+
+    $ lein dependency-check --suppression-file /suppression.xml
+
+To set a properties file:
+
+    $ lein dependency-check --properties-file /dependencycheck.properties
 
 ##  Suppressing False Positives
 

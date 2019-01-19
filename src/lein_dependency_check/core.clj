@@ -1,14 +1,12 @@
 (ns lein-dependency-check.core
   (:require [clojure.java.io :as io]
-            [clojure.pprint :refer [pprint]]
-            [clojure.string :refer [starts-with?]])
+            [clojure.pprint :refer [pprint]])
   (:import (org.owasp.dependencycheck Engine)
            (org.owasp.dependencycheck.utils Settings Settings$KEYS)
            (org.owasp.dependencycheck.data.nvdcve CveDB)
            (org.owasp.dependencycheck.reporting ReportGenerator ReportGenerator$Format)
 		   (org.apache.log4j PropertyConfigurator)))
 
-(defonce SUPPRESSION_FILE "suppression.xml")
 (defonce SOURCE_DIR       "src")
 (defonce LOG_CONF_FILE    "log4j.properties")
 
@@ -29,10 +27,10 @@
 
 (defn- scan-files
   "Scans the specified files and returns the engine used to scan"
-  [files {:keys [properties-file]}]
+  [files {:keys [properties-file suppression-file]}]
   (let [settings (Settings.)
-        _ (when (.exists (io/as-file SUPPRESSION_FILE))
-            (.setString settings Settings$KEYS/SUPPRESSION_FILE SUPPRESSION_FILE))
+        _ (when (.exists (io/as-file suppression-file))
+            (.setString settings Settings$KEYS/SUPPRESSION_FILE suppression-file))
         _ (when properties-file
             (.mergeProperties settings properties-file))
         engine (Engine. settings)]
@@ -56,7 +54,8 @@
 
 (defn- write-report
   [engine report-name output-format output-directory]
-  (.writeReports engine report-name output-directory output-format)
+  (doseq [format output-format]
+    (.writeReports engine report-name output-directory format))
   engine)
 
 (defn- handle-vulnerabilities [engine {:keys [log throw]}]
@@ -72,13 +71,13 @@
       (throw (ex-info "Vulnerable Dependencies!" {:vulnerable vulnerable-dependencies}))))
   engine)
 
+
 (defn main
   "Scans the JAR files found on the class path and creates a vulnerability report."
-  [project-classpath project-name output-format output-directory config]
+  [project-classpath project-name config]
   (reconfigure-log4j)
-  (let [output-format (if (starts-with? output-format ":")
-                        (.substring output-format 1)
-                        output-format)
+  (let [{:keys [output-format output-directory]} config
+        output-format (mapv name output-format)
         output-target (io/file output-directory)]
     (-> project-classpath
         target-files
