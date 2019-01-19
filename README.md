@@ -19,9 +19,9 @@ If you are on Leiningen 1.x do `lein plugin install lein-dependency-check 1.0.4`
 Add `[com.livingsocial/lein-dependency-check "1.0.4"]` to the `:plugins` vector of your project.clj.
 
 Project-level configuration may be provided under a `:dependency-check` key in your project.clj. Currently supported options are:
- * `:log` log each vulnerability found to stdout
- * `:throw` throw an exception after analysis and reporting if vulnerabilities are found, eg. to fail a build
- * `:min-cvss` minimum cvss score required to `:throw` (number from 0 to 10), defaults to 0
+ * `log` log each vulnerability found to stdout
+ * `throw` throw an exception after analysis and reporting if vulnerabilities are found, eg. to fail a build
+ * `min-cvss` minimum cvss score required to `:throw` (number from 0 to 10), defaults to 0
  * `properties-file` Specifies a file that contains properties to merge with default values
  * `output-format` Vector of desired output formats: xml, csv, json, html, vuln, all
  * `output-directory` Directory to output results to
