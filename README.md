@@ -53,7 +53,7 @@ To set throw error when vulnerabilities found:
 
     $ lein dependency-check --throw
     
-To only throw if there are vulnerabilities with or above a certain CVSS:
+To only throw if there are vulnerabilities with or above a given CVSS:
 
     $ lein dependency-check --throw --min-cvss 5
 

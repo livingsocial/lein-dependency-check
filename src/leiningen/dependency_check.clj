@@ -9,7 +9,7 @@
   log, throw, output-format, output-directory, properties-file."
   [[nil "--log" "Log to stdout"]
    [nil "--throw" "throw error when vulnerabilities found"]
-   [nil "--min-cvss" "minimum cvss score required to throw (use in conjunction with --throw)"
+   [nil "--min-cvss NUMBER" "minimum cvss score required to throw (use in conjunction with --throw)"
     :parse-fn #(Double/parseDouble %)]
    ["-p" "--properties-file FILE" "Specifies a file that contains properties to merge with defaults."]
    ["-f" "--output-format FORMAT(S)" "The output format to write to (XML, HTML, CSV, JSON, VULN, ALL). Default is HTML"
