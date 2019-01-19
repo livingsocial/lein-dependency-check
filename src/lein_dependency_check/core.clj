@@ -58,7 +58,7 @@
     (.writeReports engine report-name output-directory format))
   engine)
 
-(defn- handle-vulnerabilities [engine {:keys [log throw]}]
+(defn- handle-vulnerabilities [engine {:keys [log throw min-cvss] :or {min-cvss 0}}]
   (.close engine)
   (when-let [vulnerable-dependencies (->> (.getDependencies engine)
                                           (filter #((complement empty?) (.getVulnerabilities %)))
@@ -68,7 +68,12 @@
     (when log
       (doall (map #(prn "Vulnerable Dependency:" (.toString %)) vulnerable-dependencies)))
     (when throw
-      (throw (ex-info "Vulnerable Dependencies!" {:vulnerable vulnerable-dependencies}))))
+      (let [max-score (->> vulnerable-dependencies
+                           (mapcat :vulnerabilities)
+                           (map #(.getCvssScore %))
+                           (apply max))]
+        (when (>= max-score min-cvss)
+          (throw (ex-info "Vulnerable Dependencies!" {:vulnerable vulnerable-dependencies}))))))
   engine)
 
 
