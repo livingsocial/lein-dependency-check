@@ -74,7 +74,7 @@
                            (apply max))]
         (when (>= max-score min-cvss)
           (pprint vulnerable-dependencies)
-          (throw (ex-info "Vulnerable Dependencies!" {:vulnerable vulnerable-dependencies}))))))
+          (throw (ex-info "Vulnerable Dependencies!" {:vulnerable (count vulnerable-dependencies)}))))))
   engine)
 
 
