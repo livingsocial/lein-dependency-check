@@ -31,11 +31,10 @@
 (defn- dependency-check-project
   "Create a project to launch dependency-check, with only dependency-check as a dependency."
   [project]
-  (if-let [dependency-check-vec (first
-                                 (drop-while
-                                  (complement
-                                   (fn [v] (= (first v) 'com.livingsocial/lein-dependency-check)))
-                                  (:plugins project)))]
+  (if-let [dependency-check-vec (->> (:plugins project)
+                                     (filter #(= 'com.livingsocial/lein-dependency-check
+                                                 (first %)))
+                                     first)]
     {:dependencies [dependency-check-vec]}
     (throw (Exception. (str "dependency-check should be in your :plugins vector, "
                             "either in your ~/.lein/profiles.clj or in "
