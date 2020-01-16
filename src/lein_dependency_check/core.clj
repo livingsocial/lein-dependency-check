@@ -2,10 +2,11 @@
   (:require [clojure.java.io :as io]
             [clojure.pprint :refer [pprint]])
   (:import (org.owasp.dependencycheck Engine)
+           (org.owasp.dependencycheck.dependency Vulnerability)
            (org.owasp.dependencycheck.utils Settings Settings$KEYS)
            (org.owasp.dependencycheck.data.nvdcve CveDB)
            (org.owasp.dependencycheck.reporting ReportGenerator ReportGenerator$Format)
-		   (org.apache.log4j PropertyConfigurator)))
+           (org.apache.log4j PropertyConfigurator)))
 
 (defonce SOURCE_DIR       "src")
 (defonce LOG_CONF_FILE    "log4j.properties")
@@ -58,7 +59,16 @@
     (.writeReports engine report-name output-directory format))
   engine)
 
-(defn- handle-vulnerabilities [engine {:keys [log throw min-cvss] :or {min-cvss 0}}]
+
+(defn- get-cvss-v3-score
+  [^Vulnerability v]
+  ;; Some vulnerabilities don't have CVSS assigned
+  (if-let [cvss-v3 (.getCvssV3 v)]
+    (.getBaseScore cvss-v3)
+    0))
+
+
+(defn- handle-vulnerabilities [engine {:keys [log throw min-cvss-v3] :or {min-cvss-v3 0}}]
   (.close engine)
   (when-let [vulnerable-dependencies (->> (.getDependencies engine)
                                           (filter #((complement empty?) (.getVulnerabilities %)))
@@ -70,9 +80,9 @@
     (when throw
       (let [max-score (->> vulnerable-dependencies
                            (mapcat :vulnerabilities)
-                           (map #(.getCvssScore %))
+                           (map get-cvss-v3-score)
                            (apply max))]
-        (when (>= max-score min-cvss)
+        (when (>= max-score min-cvss-v3)
           (pprint vulnerable-dependencies)
           (throw (ex-info "Vulnerable Dependencies!" {:vulnerable (count vulnerable-dependencies)}))))))
   engine)
