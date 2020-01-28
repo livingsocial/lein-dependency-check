@@ -21,7 +21,7 @@ Add `[com.livingsocial/lein-dependency-check "1.1.3"]` to the `:plugins` vector 
 Project-level configuration may be provided under a `:dependency-check` key in your project.clj. Currently supported options are:
  * `log` log each vulnerability found to stdout
  * `throw` throw an exception after analysis and reporting if vulnerabilities are found, eg. to fail a build
- * `min-cvss` minimum cvss score required to `:throw` (number from 0 to 10), defaults to 0
+ * `min-cvss-v3` minimum [CVSSv3](https://nvd.nist.gov/vuln-metrics/cvss) score required to `:throw` (number from 0.0 to 10.0), defaults to 0.0
  * `properties-file` Specifies a file that contains properties to merge with default values
  * `output-format` Vector of desired output formats: xml, csv, json, html, vuln, all
  * `output-directory` Directory to output results to
@@ -53,9 +53,9 @@ To set throw error when vulnerabilities found:
 
     $ lein dependency-check --throw
     
-To only throw if there are vulnerabilities with or above a given CVSS:
+To only throw if there are vulnerabilities with or above a given CVSSv3:
 
-    $ lein dependency-check --throw --min-cvss 5
+    $ lein dependency-check --throw --min-cvss-v3 5
 
 To set a suppression file:
 

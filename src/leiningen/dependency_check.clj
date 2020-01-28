@@ -9,7 +9,7 @@
   log, throw, output-format, output-directory, properties-file."
   [[nil "--log" "Log to stdout"]
    [nil "--throw" "throw error when vulnerabilities found"]
-   [nil "--min-cvss NUMBER" "minimum cvss score required to throw (use in conjunction with --throw)"
+   [nil "--min-cvss-v3 NUMBER" "minimum cvss score required to throw (use in conjunction with --throw)"
     :parse-fn #(Double/parseDouble %)]
    ["-p" "--properties-file FILE" "Specifies a file that contains properties to merge with defaults."]
    ["-f" "--output-format FORMAT(S)" "The output format to write to (XML, HTML, CSV, JSON, VULN, ALL). Default is HTML"
@@ -26,7 +26,7 @@
    :suppression-file "suppression.xml"
    :log              false
    :throw            false
-   :min-cvss         0})
+   :min-cvss-v3      0})
 
 (defn- dependency-check-project
   "Create a project to launch dependency-check, with only dependency-check as a dependency."
