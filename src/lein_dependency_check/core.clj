@@ -3,10 +3,10 @@
             [clojure.pprint :refer [pprint]])
   (:import (org.owasp.dependencycheck Engine)
            (org.owasp.dependencycheck.dependency Vulnerability)
+           (org.owasp.dependencycheck.exception ExceptionCollection)
            (org.owasp.dependencycheck.utils Settings Settings$KEYS)
-           (org.owasp.dependencycheck.data.nvdcve CveDB)
-           (org.owasp.dependencycheck.reporting ReportGenerator ReportGenerator$Format)
-           (org.apache.log4j PropertyConfigurator)))
+           (org.apache.log4j PropertyConfigurator)
+           (java.io File)))
 
 (defonce SOURCE_DIR       "src")
 (defonce LOG_CONF_FILE    "log4j.properties")
@@ -14,7 +14,7 @@
 (defn reconfigure-log4j
   "Reconfigures log4j from a log4j.properties file"
   []
-  (let [config-file (io/file SOURCE_DIR LOG_CONF_FILE)]
+  (let [^File config-file (io/file SOURCE_DIR LOG_CONF_FILE)]
     (when (.exists config-file)
 	   (prn "Reconfiguring log4j")
 	   (PropertyConfigurator/configure (.getPath config-file)))))
@@ -28,7 +28,7 @@
 
 (defn- scan-files
   "Scans the specified files and returns the engine used to scan"
-  [files {:keys [properties-file suppression-file]}]
+  [files {:keys [^File properties-file suppression-file]}]
   (let [settings (Settings.)
         _ (when (.exists (io/as-file suppression-file))
             (.setString settings Settings$KEYS/SUPPRESSION_FILE suppression-file))
@@ -36,7 +36,7 @@
             (.mergeProperties settings properties-file))
         engine (Engine. settings)]
     (prn "Scanning" (count files) "file(s)...")
-    (doseq [file files]
+    (doseq [^File file files]
       (prn "Scanning file" (.getCanonicalPath file))
       (.scan engine file))
     (prn "Done.")
@@ -56,7 +56,7 @@
 (defn- write-report
   [engine report-name output-format output-directory]
   (doseq [format output-format]
-    (.writeReports engine report-name output-directory format))
+    (.writeReports engine report-name output-directory format (ExceptionCollection.)))
   engine)
 
 
