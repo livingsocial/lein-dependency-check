@@ -1,6 +1,6 @@
 (def dependency-check-version "6.2.2")
 
-(defproject com.livingsocial/lein-dependency-check "1.1.7"
+(defproject com.livingsocial/lein-dependency-check "1.1.6"
   :description "Clojure command line tool for detecting vulnerable project dependencies"
   :url "https://github.com/livingsocial/lein-dependency-check"
   :license {:name "The MIT License (MIT)"
