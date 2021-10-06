@@ -33,7 +33,7 @@
         _ (when (.exists (io/as-file suppression-file))
             (.setString settings Settings$KEYS/SUPPRESSION_FILE suppression-file))
         _ (when properties-file
-            (.mergeProperties settings properties-file))
+            (.mergeProperties settings  (io/as-file properties-file)))
         engine (Engine. settings)]
     (prn "Scanning" (count files) "file(s)...")
     (doseq [^File file files]
