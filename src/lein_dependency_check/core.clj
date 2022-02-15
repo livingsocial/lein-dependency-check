@@ -5,19 +5,19 @@
            (org.owasp.dependencycheck.dependency Vulnerability)
            (org.owasp.dependencycheck.exception ExceptionCollection)
            (org.owasp.dependencycheck.utils Settings Settings$KEYS)
-           (org.apache.log4j PropertyConfigurator)
+           (org.apache.logging.log4j.core.config Configurator)
            (java.io File)))
 
 (defonce SOURCE_DIR       "src")
-(defonce LOG_CONF_FILE    "log4j.properties")
+(defonce LOG_CONF_FILE    "log4j2.xml")
 
 (defn reconfigure-log4j
-  "Reconfigures log4j from a log4j.properties file"
+  "Reconfigures log4j from a log4j2.xml file"
   []
   (let [^File config-file (io/file SOURCE_DIR LOG_CONF_FILE)]
     (when (.exists config-file)
 	   (prn "Reconfiguring log4j")
-	   (PropertyConfigurator/configure (.getPath config-file)))))
+     (Configurator/initialize nil (.getPath config-file)))))
 
 (defn- target-files
   "Selects the files to be scanned"
@@ -33,7 +33,7 @@
         _ (when (.exists (io/as-file suppression-file))
             (.setString settings Settings$KEYS/SUPPRESSION_FILE suppression-file))
         _ (when properties-file
-            (.mergeProperties settings  (io/as-file properties-file)))
+            (.mergeProperties settings ^File (io/as-file properties-file)))
         engine (Engine. settings)]
     (prn "Scanning" (count files) "file(s)...")
     (doseq [^File file files]
