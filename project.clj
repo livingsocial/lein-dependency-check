@@ -1,4 +1,4 @@
-(def dependency-check-version "7.2.1")
+(def dependency-check-version "7.4.4")
 
 (defproject com.livingsocial/lein-dependency-check "1.4.0"
   :description "Clojure command line tool for detecting vulnerable project dependencies"
